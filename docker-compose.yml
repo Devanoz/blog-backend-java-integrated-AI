@@ -18,3 +18,7 @@ services:
     environment:
       - PMA_ARBITRARY=1
     # (this is just an example, not intended to be a production configuration)
+  redis:
+    image: redis
+    restart: always
+    ports:
