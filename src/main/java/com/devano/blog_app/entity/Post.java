@@ -3,18 +3,62 @@ package com.devano.blog_app.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.Instant;
+import java.util.List;
+
 @Data
 @Entity
+@Table(name = "post")
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+
+    @Column(length = 100, nullable = false)
     private String title;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
-    @Column(unique = true)
+
+    @Column(length = 100, nullable = false,unique = true)
     private String slug;
-    private boolean isPublished;
-    private boolean isDeleted;
+
+    @Column(nullable = false)
+    private Boolean isPublished = false;
+
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
+    @Column(name = "comment_count",nullable = false)
+    private Integer commentCount = 0;
+
+    @Column(name = "updated_at")
+    private Long updatedAt;
+
+    @Column(name = "created_at", nullable = false)
     private Long createdAt;
-    private Integer publishedAt;
+
+    @Column(name = "published_at")
+    private Long publishedAt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @PrePersist
+    public void onCreate() {
+        long currentEpochTime = Instant.now().toEpochMilli();
+        this.createdAt = currentEpochTime;
+        this.updatedAt = currentEpochTime;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = Instant.now().toEpochMilli();
+    }
+
 }
