@@ -1,4 +1,4 @@
-package com.devano.blog_app.repository;
+package com.devano.blog_app.repository.jpa;
 
 import com.devano.blog_app.entity.Comment;
 import org.springframework.data.domain.Page;
