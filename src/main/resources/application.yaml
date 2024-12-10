@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: blog-app
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/blog
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  flyway:
+    enabled: false
+    url: jdbc:mysql://localhost:3306/blog
+    user: root
+    password: password
+    locations: classpath:db/migration
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      backendA:
+        register-health-indicator: true
+        sliding-window-size: 100
+        sliding-window-type: count_based
+logging:
+  level:
+    root: trace
