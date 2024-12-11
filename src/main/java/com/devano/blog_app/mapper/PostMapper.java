@@ -13,6 +13,7 @@ public interface PostMapper {
     PostMapper mapper = Mappers.getMapper(PostMapper.class);
 
     Post mapToPostEntity(CreatePostRequest postRequest);
+    CreatePostResponse mapPostToCreatePostResponse(Post post);
 
     List<CreatePostResponse> mapToCreatePostResponse(List<Post> posts);
 }
