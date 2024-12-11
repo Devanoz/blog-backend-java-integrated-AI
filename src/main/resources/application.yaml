@@ -23,10 +23,18 @@ spring:
 resilience4j:
   circuitbreaker:
     instances:
-      backendA:
-        register-health-indicator: true
-        sliding-window-size: 100
-        sliding-window-type: count_based
+      gemini:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+
+
 logging:
   level:
-    root: trace
+    root: debug
