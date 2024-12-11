@@ -52,9 +52,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Send 401 Unauthorized response
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json");
-            try (PrintWriter writer = response.getWriter()) {
+            PrintWriter writer = response.getWriter();
                 writer.write("{\"error\": \""+ e.getMessage() +"\"}");
-            }
             return; // Stop further processing of the filter chain
         }
         filterChain.doFilter(request,response);
