@@ -22,4 +22,9 @@ public class ApiExceptionHandler {
 //    public ResponseEntity<ApiExceptionResponse> handleHibernateValidation(MethodArgumentNotValidException e) {
 //        return null;
 //    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiExceptionResponse> handler(Exception e) {
+        ApiExceptionResponse exception = ApiExceptionResponse.builder().errorMessages(List.of(e.getMessage())).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception);
+    }
 }
