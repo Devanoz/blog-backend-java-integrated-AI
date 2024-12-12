@@ -1,8 +1,10 @@
 package com.devano.blog_app.controller;
 
-import com.devano.blog_app.entity.Comment;
+import com.devano.blog_app.request.comment.CreateCommentRequest;
+import com.devano.blog_app.response.comment.CreateCommentResponse;
 import com.devano.blog_app.service.CommentService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +21,10 @@ public class CommentController {
         return commentService.getComments(postSlug,page,limit);
     }
 
-    @PostMapping("")
-    public Comment createComment(@RequestBody Comment comment) {
-        return commentService.createComment(comment);
+    @PostMapping("/post/{postId}")
+    public ResponseEntity<CreateCommentResponse> createComment(@PathVariable("postId") Integer postId , @RequestBody CreateCommentRequest comment) {
+        CreateCommentResponse commentResponse = commentService.createComment(postId, comment);
+        return ResponseEntity.ok(commentResponse);
     }
 
     @GetMapping("/{id}")

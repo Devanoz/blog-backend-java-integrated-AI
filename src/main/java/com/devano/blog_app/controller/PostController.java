@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/api/posts")
 @AllArgsConstructor
 public class PostController {
-    PostService postService;
+    private PostService postService;
 
     @GetMapping
     public List<CreatePostResponse> getPosts() {
