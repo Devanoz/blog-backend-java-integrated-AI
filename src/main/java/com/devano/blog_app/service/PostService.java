@@ -27,7 +27,7 @@ public class PostService {
 
     PostRepository postRepository;
     private GeminiService geminiService;
-    final PostMapper postmapper = PostMapper.mapper;
+    private final PostMapper postmapper = PostMapper.mapper;
 
     @Cacheable(cacheNames = "post", key = "'post-key'")
     public List<CreatePostResponse> getPosts() {
@@ -35,16 +35,18 @@ public class PostService {
         return postmapper.mapToCreatePostResponse(posts);
     }
 
-    public Post getPostBySlug(String slug) {
-        return postRepository.findFirstBySlug(slug).orElseThrow(()-> new ApiException("Not found", HttpStatus.NOT_FOUND));
+    public CreatePostResponse getPostBySlug(String slug) {
+        Post post = postRepository.findFirstBySlug(slug).orElseThrow(() -> new ApiException("Not found", HttpStatus.NOT_FOUND));
+        return postmapper.mapPostToCreatePostResponse(post);
     }
 
-    public Post createPost(CreatePostRequest post) {
+    public CreatePostResponse createPost(CreatePostRequest post) {
         Post postEntity = postmapper.mapToPostEntity(post);
-        return postRepository.save(postEntity);
+        Post savedPost = postRepository.save(postEntity);
+        return postmapper.mapPostToCreatePostResponse(savedPost);
     }
 
-    @CircuitBreaker(name = "gemini",fallbackMethod ="fallback" )
+    @CircuitBreaker(name = "gemini", fallbackMethod = "fallback")
     public CreatePostResponse createPostUsingGemini(CreateGeminiPostRequest request) {
 
         ResponseEntity<GeminiResponse> response = geminiService.generatePost(request.getTitle());
@@ -54,7 +56,7 @@ public class PostService {
                 .title(request.getTitle())
                 .slug(request.getSlug())
                 .body(newArticle)
-                        .commentCount(0)
+                .commentCount(0)
                 .isDeleted(false)
                 .isPublished(true)
                 .build()
@@ -62,38 +64,39 @@ public class PostService {
         return postmapper.mapPostToCreatePostResponse(post);
     }
 
+    //fallback method when #createPostUsingGeminiThrownException
     private CreatePostResponse fallback(CreateGeminiPostRequest request, Exception e) {
         return CreatePostResponse.builder()
-                .id(0L )
+                .id(0L)
                 .body("Gemini service is not available now")
                 .build();
     }
 
     public Post updatePostById(Integer postId, Post sentPostByUser) {
         Optional<Post> retreivedPost = postRepository.findById(postId);
-        if(retreivedPost.isPresent()) {
-            sentPostByUser.setSlug(sentPostByUser.getSlug());
-            sentPostByUser.setTitle(sentPostByUser.getTitle());
-            return retreivedPost.get();
+        if (retreivedPost.isEmpty()) {
+            throw new ApiException("Post not found", HttpStatus.NOT_FOUND);
         }
-        return null;
+        sentPostByUser.setSlug(sentPostByUser.getSlug());
+        sentPostByUser.setTitle(sentPostByUser.getTitle());
+        return retreivedPost.get();
     }
 
     public Boolean deletePostById(Integer id) {
         Post savedPost = postRepository.findById(id).orElse(null);
-        if(savedPost == null) {
-            return false;
+        if (savedPost == null) {
+            throw new ApiException("Post not found",HttpStatus.NOT_FOUND);
         }
         savedPost.setIsDeleted(true);
         postRepository.save(savedPost);
-        return true;
+       return true;
     }
 
-    @CacheEvict(cacheNames = "post",key = "'post-key'")
+    @CacheEvict(cacheNames = "post", key = "'post-key'")
     public Boolean publishPost(Integer id) {
         Optional<Post> savedPostById = postRepository.findById(id);
-        if(savedPostById.isEmpty()) {
-            return false;
+        if (savedPostById.isEmpty()) {
+            throw new ApiException("post not found", HttpStatus.NOT_FOUND);
         }
         Post post = savedPostById.get();
         post.setIsPublished(true);

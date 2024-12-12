@@ -5,7 +5,6 @@ import com.devano.blog_app.request.post.CreateGeminiPostRequest;
 import com.devano.blog_app.request.post.CreatePostRequest;
 import com.devano.blog_app.response.post.CreatePostResponse;
 import com.devano.blog_app.service.PostService;
-import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +24,9 @@ public class PostController {
     }
 
     @PostMapping
-    public Post createPost(@RequestBody @Valid CreatePostRequest post) {
-        return postService.createPost(post);
+    public ResponseEntity<CreatePostResponse> createPost(@RequestBody @Valid CreatePostRequest post) {
+        CreatePostResponse postResponse = postService.createPost(post);
+        return ResponseEntity.ok(postResponse);
     }
 
     @PostMapping("/ai/gemini")
@@ -35,10 +35,10 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/{slug}")
-    public Post getPostBySlug(@PathVariable("slug") String slug) {
-        return postService.getPostBySlug(slug);
+    public ResponseEntity<CreatePostResponse> getPostBySlug(@PathVariable("slug") String slug) {
+        CreatePostResponse postBySlug = postService.getPostBySlug(slug);
+        return ResponseEntity.ok(postBySlug);
     }
 
     @PutMapping("/{id}")
