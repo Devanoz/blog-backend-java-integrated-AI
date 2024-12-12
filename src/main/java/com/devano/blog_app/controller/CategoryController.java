@@ -19,7 +19,7 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CreateCategoryResponse> createCategory(@RequestBody CreateCategoryRequest categoryRequest) {
-        categoryService.createCategory(categoryRequest);
-        return null;
+        CreateCategoryResponse response = categoryService.createCategory(categoryRequest);
+        return ResponseEntity.ok(response);
     }
 }
