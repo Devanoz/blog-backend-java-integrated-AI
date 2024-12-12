@@ -19,6 +19,9 @@ spring:
     user: root
     password: password
     locations: classpath:db/migration
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
 resilience4j:
   circuitbreaker:
@@ -32,7 +35,6 @@ resilience4j:
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
         slidingWindowType: COUNT_BASED
-
 
 
 logging:
